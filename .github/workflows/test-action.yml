@@ -18,4 +18,4 @@ jobs:
           url: "ghcr.io/hemaladev57/testaction/custom-action:latest"
           digest: "test"
           type: "docker"
-          cloudbees-pat: test
+          cloudbees-pat: "cb_api_5u0ptmVo07uwhSe853SvovHdIwQG0kRbKWq4vWD1BGGmJI7FLmNXbUtsz5eFGpgg+7ldcBpaIchFzFLCF3zvGg=="
