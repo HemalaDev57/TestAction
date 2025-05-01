@@ -210,7 +210,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 		if err := json.Unmarshal(bodyBytes, &bodyObj); err == nil && bodyObj.Message != "" {
 			msg = bodyObj.Message
 		}
-		return fmt.Errorf("error sending CloudEvent to platform - status: %d (%s): %s", resp.StatusCode, resp.Status, msg)
+		return fmt.Errorf("error sending CloudEvent to platform - %s : %s", resp.Status, msg)
 	}
 	fmt.Println("CloudEvent sent successfully!")
 	return nil
