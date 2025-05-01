@@ -15,7 +15,7 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v4
         with:
-          repository: HemalaDev57/TestAction-read
+          repository: HemalaDev57/TestAction
           ref: master
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           
