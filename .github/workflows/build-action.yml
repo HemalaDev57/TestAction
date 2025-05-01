@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: HemalaDev57/TestAction-read
-          ref: main
+          ref: master
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           
       - id: build-go-binary
