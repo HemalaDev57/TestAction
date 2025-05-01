@@ -54,11 +54,11 @@ func setEnvVars(cfg *Config) error {
 	}
 	cfg.CloudBeesApiUrl = cloudBeesApiUrl
 
-	cloudBeesApiToken := os.Getenv(CloudbeesApiToken)
-	if cloudBeesApiToken == "" {
-		return fmt.Errorf(CloudbeesApiToken + " is not set in the environment")
-	}
-	cfg.CloudBeesApiToken = cloudBeesApiToken
+	// cloudBeesApiToken := os.Getenv(CloudbeesApiToken)
+	// if cloudBeesApiToken == "" {
+	// 	return fmt.Errorf(CloudbeesApiToken + " is not set in the environment")
+	// }
+	// cfg.CloudBeesApiToken = cloudBeesApiToken
 
 	artifactName := os.Getenv(ArtifactName)
 	if artifactName == "" {
