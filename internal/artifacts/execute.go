@@ -205,10 +205,16 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf(
-			"error sending CloudEvent to platform - status: %d (%s)\nbody: %s",
-			resp.StatusCode, resp.Status, string(bodyBytes),
-		)
+		var bodyObj struct {
+			Code    int           `json:"code"`
+			Message string        `json:"message"`
+			Details []interface{} `json:"details"` // adjust type as needed
+		}
+		msg := string(bodyBytes)
+		if err := json.Unmarshal(bodyBytes, &bodyObj); err == nil && bodyObj.Message != "" {
+			msg = bodyObj.Message
+		}
+		return fmt.Errorf("error sending CloudEvent to platform - status: %d (%s): %s", resp.StatusCode, resp.Status, msg)
 	}
 	fmt.Println("CloudEvent sent successfully!")
 	return nil
