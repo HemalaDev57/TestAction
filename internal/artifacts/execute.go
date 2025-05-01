@@ -174,13 +174,15 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	if err != nil {
 		return fmt.Errorf("error encoding CloudEvent JSON %s", err)
 	}
+	oidcToken := getOIDCToken()
+	fmt.Println("OIDC Token:", oidcToken)
 	req, _ := http.NewRequest(PostMethod, getCloudbeesFullUrl(config), bytes.NewBuffer(eventJSON))
 	fmt.Println(PrettyPrint(cloudEvent))
 	// For Local Testing
 	//req, _ := http.NewRequest(PostMethod, "http://localhost:8080/events", bytes.NewBuffer(eventJSON))
 
 	req.Header.Set(ContentTypeHeaderKey, ContentTypeCloudEventsJson)
-	req.Header.Set(AuthorizationHeaderKey, Bearer+config.CloudBeesApiToken)
+	req.Header.Set(AuthorizationHeaderKey, Bearer+oidcToken)
 	client := &http.Client{}
 	resp, err := client.Do(req) // Fire and forget
 
@@ -214,6 +216,26 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	}
 	fmt.Println("CloudEvent sent successfully!")
 	return nil
+}
+func getOIDCToken() string {
+	oidcURL := os.Getenv("ACTIONS_ID_TOKEN_REQUEST_URL")
+	oidcToken := os.Getenv("ACTIONS_ID_TOKEN_REQUEST_TOKEN")
+
+	req, _ := http.NewRequest("GET", oidcURL, nil)
+	req.Header.Add(AuthorizationHeaderKey, Bearer+oidcToken)
+	resp, _ := http.DefaultClient.Do(req)
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Println("Error closing response body:", err)
+		}
+	}(resp.Body)
+	fmt.Println("Response Status:", resp.Status)
+	fmt.Println("Response :", resp)
+	var tokenResp struct{ Value string }
+	json.NewDecoder(resp.Body).Decode(&tokenResp)
+
+	return tokenResp.Value
 }
 
 // PrettyPrint converts the input to JSON string

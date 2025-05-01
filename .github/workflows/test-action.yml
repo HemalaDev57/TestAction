@@ -6,6 +6,9 @@ on:
 jobs:
   run-go-action:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -18,4 +21,3 @@ jobs:
           url: "ghcr.io/hemaladev57/testaction/custom-action:latest"
           digest: "test"
           type: "docker"
-          cloudbees-pat: "cb_api_5u0ptmVo07uwhSe853SvovHdIwQG0kRbKWq4vWD1BGGmJI7FLmNXbUtsz5eFGpgg+7ldcBpaIchFzFLCF3zvGg=="
