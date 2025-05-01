@@ -18,8 +18,6 @@ jobs:
           echo "Requesting OIDC token..."
           RESPONSE=$(curl -sSL -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL")
           TOKEN=$(echo "$RESPONSE" | jq -r .value)
-          echo "::add-mask::$TOKEN"
           echo "OIDC token retrieved. Length: ${#TOKEN}"
           echo "$TOKEN" > oidc_token.txt
-          head -c 200 oidc_token.txt
-
+          head -c 300 oidc_token.txt
