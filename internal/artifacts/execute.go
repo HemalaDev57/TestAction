@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -183,7 +184,10 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	req.Header.Set(AuthorizationHeaderKey, Bearer+config.CloudBeesApiToken)
 	client := &http.Client{}
 	resp, err := client.Do(req) // Fire and forget
-
+	log.Println("Sending CloudEvent to platform...")
+	log.Println("CloudEvent JSON: ", string(eventJSON))
+	log.Println("Response : ", resp)
+	log.Println("Error : ", err)
 	if err != nil {
 		return fmt.Errorf("error sending CloudEvent to platform - %s", err.Error())
 	}
