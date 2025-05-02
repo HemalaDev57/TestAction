@@ -5,8 +5,8 @@ go 1.23.0
 toolchain go1.23.6
 
 require (
-	bou.ke/monkey v1.0.2
 	github.com/cloudevents/sdk-go/v2 v2.15.2
+	github.com/go-openapi/errors v0.22.1
 	github.com/google/uuid v1.6.0
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0

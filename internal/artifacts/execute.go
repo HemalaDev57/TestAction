@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -174,8 +176,11 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	if err != nil {
 		return fmt.Errorf("error encoding CloudEvent JSON %s", err)
 	}
-	oidcToken := getOIDCToken()
-	fmt.Println("OIDC Token:", oidcToken)
+	oidcToken, err := getOIDCToken(config.CloudBeesApiUrl)
+	if err != nil {
+		return fmt.Errorf("failed to create oidc token - %s", err.Error())
+	}
+
 	req, _ := http.NewRequest(PostMethod, getCloudbeesFullUrl(config), bytes.NewBuffer(eventJSON))
 	fmt.Println(PrettyPrint(cloudEvent))
 	// For Local Testing
@@ -217,25 +222,43 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	fmt.Println("CloudEvent sent successfully!")
 	return nil
 }
-func getOIDCToken() string {
-	oidcURL := os.Getenv("ACTIONS_ID_TOKEN_REQUEST_URL")
+func getOIDCToken(cloudbeesUrl string) (string, error) {
+	oidcURL := os.Getenv("ACTIONS_ID_TOKEN_REQUEST_URL") + "&audience=" + cloudbeesUrl
 	oidcToken := os.Getenv("ACTIONS_ID_TOKEN_REQUEST_TOKEN")
 
-	req, _ := http.NewRequest("GET", oidcURL, nil)
-	req.Header.Add(AuthorizationHeaderKey, Bearer+oidcToken)
-	resp, _ := http.DefaultClient.Do(req)
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			fmt.Println("Error closing response body:", err)
-		}
-	}(resp.Body)
-	fmt.Println("Response Status:", resp.Status)
-	fmt.Println("Response :", resp)
-	var tokenResp struct{ Value string }
-	json.NewDecoder(resp.Body).Decode(&tokenResp)
+	req, err := http.NewRequest("GET", oidcURL, nil)
+	if err != nil {
+		log.Fatalf("Failed to create OIDC request: %v", err)
+		return "", err
+	}
+	req.Header.Add("Authorization", "Bearer "+oidcToken)
 
-	return tokenResp.Value
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Fatalf("Failed to execute OIDC request: %v", err)
+		return "", err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(res.Body)
+		log.Fatalf("OIDC token request failed. Status: %d, Body: %s", res.StatusCode, string(body))
+		return "", errors.New("OIDC token request failed")
+	}
+
+	var oidcResp struct{ Value string }
+	if err := json.NewDecoder(res.Body).Decode(&oidcResp); err != nil {
+		log.Fatalf("Failed to decode OIDC response: %v", err)
+		return "", err
+	}
+
+	if oidcResp.Value == "" {
+		log.Fatal("OIDC token value is empty")
+		return "", errors.New("OIDC token value is empty")
+	}
+	fmt.Println("Response Status:", res.Status)
+	fmt.Println("Response :", res)
+	return oidcResp.Value, nil
 }
 
 // PrettyPrint converts the input to JSON string
