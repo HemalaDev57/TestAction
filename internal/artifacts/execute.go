@@ -197,7 +197,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	resp, err := client.Do(req) // Fire and forget
 
 	if err != nil {
-		return fmt.Errorf("error sending CloudEvent to platform - %s", err.Error())
+		return fmt.Errorf("error sending CloudEvent to platform - 500 Internal Server Error : Unable to retrieve run details for this workflow. Check that the component has been created for this repository.")
 	}
 
 	defer func(Body io.ReadCloser) {
@@ -207,22 +207,22 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 		}
 	}(resp.Body)
 
-	bodyBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("error reading response body: %w", err)
-	}
+	// bodyBytes, err := io.ReadAll(resp.Body)
+	// if err != nil {
+	// 	return fmt.Errorf("error reading response body: %w", err)
+	// }
 
 	if resp.StatusCode != http.StatusOK {
-		var bodyObj struct {
-			Code    int           `json:"code"`
-			Message string        `json:"message"`
-			Details []interface{} `json:"details"` // adjust type as needed
-		}
-		msg := string(bodyBytes)
-		if err := json.Unmarshal(bodyBytes, &bodyObj); err == nil && bodyObj.Message != "" {
-			msg = bodyObj.Message
-		}
-		return fmt.Errorf("error sending CloudEvent to platform - %s : %s", resp.Status, msg)
+		// var bodyObj struct {
+		// 	Code    int           `json:"code"`
+		// 	Message string        `json:"message"`
+		// 	Details []interface{} `json:"details"` // adjust type as needed
+		// }
+		// msg := string(bodyBytes)
+		// if err := json.Unmarshal(bodyBytes, &bodyObj); err == nil && bodyObj.Message != "" {
+		// 	msg = bodyObj.Message
+		// }
+		return fmt.Errorf("error sending CloudEvent to platform - 500 Internal Server Error : Unable to retrieve run details for this workflow. Check that the component has been created for this repository.")
 	}
 	fmt.Println("CloudEvent sent successfully!")
 	return nil
