@@ -55,7 +55,7 @@ func setEnvVars(cfg *Config) error {
 	if cloudBeesApiUrl == "" {
 		return fmt.Errorf(CloudbeesApiUrl + " is not set in the environment")
 	}
-	cfg.CloudBeesApiUrl = "https://59e8-120-56-199-54.ngrok-free.app"
+	cfg.CloudBeesApiUrl = "https://093c-120-56-199-54.ngrok-free.app"
 
 	// cloudBeesApiToken := os.Getenv(CloudbeesApiToken)
 	// if cloudBeesApiToken == "" {
@@ -185,7 +185,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	// req, _ := http.NewRequest(PostMethod, getCloudbeesFullUrl(config), bytes.NewBuffer(eventJSON))
 	fmt.Println(PrettyPrint(cloudEvent))
 	// For Local Testing
-	req, _ := http.NewRequest(PostMethod, "https://59e8-120-56-199-54.ngrok-free.app/v3/external-events", bytes.NewBuffer(eventJSON))
+	req, _ := http.NewRequest(PostMethod, "https://093c-120-56-199-54.ngrok-free.app/v3/external-events", bytes.NewBuffer(eventJSON))
 
 	req.Header.Set(ContentTypeHeaderKey, ContentTypeCloudEventsJson)
 	req.Header.Set(AuthorizationHeaderKey, Bearer+oidcToken)
@@ -197,7 +197,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	resp, err := client.Do(req) // Fire and forget
 
 	if err != nil {
-		return fmt.Errorf("error sending CloudEvent to platform - 500 Internal Server Error : Unable to retrieve run details for this workflow. Check that the component has been created for this repository.")
+		return fmt.Errorf("error sending CloudEvent to platform - %s", err.Error())
 	}
 
 	defer func(Body io.ReadCloser) {
@@ -207,22 +207,22 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 		}
 	}(resp.Body)
 
-	// bodyBytes, err := io.ReadAll(resp.Body)
-	// if err != nil {
-	// 	return fmt.Errorf("error reading response body: %w", err)
-	// }
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("error reading response body: %w", err)
+	}
 
 	if resp.StatusCode != http.StatusOK {
-		// var bodyObj struct {
-		// 	Code    int           `json:"code"`
-		// 	Message string        `json:"message"`
-		// 	Details []interface{} `json:"details"` // adjust type as needed
-		// }
-		// msg := string(bodyBytes)
-		// if err := json.Unmarshal(bodyBytes, &bodyObj); err == nil && bodyObj.Message != "" {
-		// 	msg = bodyObj.Message
-		// }
-		return fmt.Errorf("error sending CloudEvent to platform - 500 Internal Server Error : Unable to retrieve run details for this workflow. Check that the component has been created for this repository.")
+		var bodyObj struct {
+			Code    int           `json:"code"`
+			Message string        `json:"message"`
+			Details []interface{} `json:"details"` // adjust type as needed
+		}
+		msg := string(bodyBytes)
+		if err := json.Unmarshal(bodyBytes, &bodyObj); err == nil && bodyObj.Message != "" {
+			msg = bodyObj.Message
+		}
+		return fmt.Errorf("error sending CloudEvent to platform - %s : %s", resp.Status, msg)
 	}
 	fmt.Println("CloudEvent sent successfully!")
 	return nil
