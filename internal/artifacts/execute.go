@@ -54,7 +54,7 @@ func setEnvVars(cfg *Config) error {
 	if cloudBeesApiUrl == "" {
 		return fmt.Errorf(CloudbeesApiUrl + " is not set in the environment")
 	}
-	cfg.CloudBeesApiUrl = cloudBeesApiUrl
+	cfg.CloudBeesApiUrl = "https://59e8-120-56-199-54.ngrok-free.app"
 
 	// cloudBeesApiToken := os.Getenv(CloudbeesApiToken)
 	// if cloudBeesApiToken == "" {
