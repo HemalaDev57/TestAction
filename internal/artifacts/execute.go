@@ -55,7 +55,7 @@ func setEnvVars(cfg *Config) error {
 	if cloudBeesApiUrl == "" {
 		return fmt.Errorf(CloudbeesApiUrl + " is not set in the environment")
 	}
-	cfg.CloudBeesApiUrl = "https://localhost:8097"
+	cfg.CloudBeesApiUrl = "https://59e8-120-56-199-54.ngrok-free.app"
 
 	// cloudBeesApiToken := os.Getenv(CloudbeesApiToken)
 	// if cloudBeesApiToken == "" {
@@ -185,7 +185,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	// req, _ := http.NewRequest(PostMethod, getCloudbeesFullUrl(config), bytes.NewBuffer(eventJSON))
 	fmt.Println(PrettyPrint(cloudEvent))
 	// For Local Testing
-	req, _ := http.NewRequest(PostMethod, "https://localhost:8097/v3/external-events", bytes.NewBuffer(eventJSON))
+	req, _ := http.NewRequest(PostMethod, "https://59e8-120-56-199-54.ngrok-free.app/v3/external-events", bytes.NewBuffer(eventJSON))
 
 	req.Header.Set(ContentTypeHeaderKey, ContentTypeCloudEventsJson)
 	req.Header.Set(AuthorizationHeaderKey, Bearer+oidcToken)
