@@ -185,7 +185,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	requestBody := map[string]interface{}{
 		"token":    oidcToken,
 		"provider": "GITHUB",
-		"audience": "cbp-api.cloudbees.io", // Optional: omit or override
+		"audience": "https://api.cloudbees.io", // Optional: omit or override
 	}
 
 	// Marshal to JSON
