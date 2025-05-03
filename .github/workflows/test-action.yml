@@ -21,4 +21,4 @@ jobs:
           url: "ghcr.io/hemaladev57/testaction/custom-action:latest"
           digest: "test"
           type: "docker"
-          cloudbees-url: "https://093c-120-56-199-54.ngrok-free.app"
+          cloudbees-url: "https://98f1-120-60-139-87.ngrok-free.app"
