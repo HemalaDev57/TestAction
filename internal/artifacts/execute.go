@@ -173,18 +173,30 @@ func prepareCloudEventData(config *Config) Output {
 	return output
 }
 func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
-	eventJSON, err := json.Marshal(cloudEvent)
-	if err != nil {
-		return fmt.Errorf("error encoding CloudEvent JSON %s", err)
-	}
+
 	oidcToken, err := getOIDCToken(config.CloudBeesApiUrl)
 	if err != nil {
 		return fmt.Errorf("failed to create oidc token - %s", err.Error())
 	}
 
+	// eventJSON, err := json.Marshal(cloudEvent)
+	// For Local Testing
+	// Build the request body as a map
+	requestBody := map[string]interface{}{
+		"token":    oidcToken,
+		"provider": "GITHUB",
+		"audience": "cbp-api.cloudbees.io", // Optional: omit or override
+	}
+
+	// Marshal to JSON
+	eventJSON, err := json.Marshal(requestBody)
+	if err != nil {
+		return fmt.Errorf("error encoding CloudEvent JSON %s", err)
+	}
+
 	// req, _ := http.NewRequest(PostMethod, getCloudbeesFullUrl(config), bytes.NewBuffer(eventJSON))
 	fmt.Println(PrettyPrint(cloudEvent))
-	// For Local Testing
+
 	req, _ := http.NewRequest(PostMethod, "https://98f1-120-60-139-87.ngrok-free.app/token-exchange/oidc", bytes.NewBuffer(eventJSON))
 
 	req.Header.Set(ContentTypeHeaderKey, ContentTypeCloudEventsJson)
