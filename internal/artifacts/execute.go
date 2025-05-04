@@ -220,18 +220,16 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	if err != nil {
 		return fmt.Errorf("error reading response body: %w", err)
 	}
-	var tokenResp struct {
-		AccessToken string `json:"access_token"`
-	}
+	var respMap map[string]interface{}
 	fmt.Println("Response Body:", string(bodyBytes))
-	if err := json.Unmarshal(bodyBytes, &tokenResp); err != nil {
+	if err := json.Unmarshal(bodyBytes, &respMap); err != nil {
 		return fmt.Errorf("failed to parse token exchange response: %w", err)
 	}
 
-	if tokenResp.AccessToken == "" {
-		return fmt.Errorf("received empty access token from token exchange")
+	accessToken, ok := respMap["access_token"].(string)
+	if !ok || accessToken == "" {
+		return fmt.Errorf("access_token missing or invalid in response")
 	}
-
 	if resp.StatusCode != http.StatusOK {
 		var bodyObj struct {
 			Code    int           `json:"code"`
@@ -255,7 +253,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	}
 
 	eventReq.Header.Set(ContentTypeHeaderKey, ContentTypeCloudEventsJson)
-	eventReq.Header.Set(AuthorizationHeaderKey, Bearer+tokenResp.AccessToken)
+	eventReq.Header.Set(AuthorizationHeaderKey, Bearer+accessToken)
 
 	eventResp, err := client.Do(eventReq)
 	if err != nil {
