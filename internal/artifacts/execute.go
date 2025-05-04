@@ -214,7 +214,8 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 			fmt.Println("Error closing response body:", err)
 		}
 	}(resp.Body)
-
+	fmt.Println("Response Status: " + resp.Status)
+	fmt.Println("Response :", resp)
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("error reading response body: %w", err)
