@@ -223,6 +223,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	var tokenResp struct {
 		AccessToken string `json:"access_token"`
 	}
+	fmt.Println("Response Body:", string(bodyBytes))
 	if err := json.Unmarshal(bodyBytes, &tokenResp); err != nil {
 		return fmt.Errorf("failed to parse token exchange response: %w", err)
 	}
