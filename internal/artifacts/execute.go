@@ -179,7 +179,6 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 		return fmt.Errorf("failed to create oidc token - %s", err.Error())
 	}
 
-	// eventJSON, err := json.Marshal(cloudEvent)
 	// For Local Testing
 	// Build the request body as a map
 	requestBody := map[string]interface{}{
@@ -189,15 +188,12 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	}
 
 	// Marshal to JSON
-	eventJSON, err := json.Marshal(requestBody)
+	tokenReqJSON, err := json.Marshal(requestBody)
 	if err != nil {
 		return fmt.Errorf("error encoding CloudEvent JSON %s", err)
 	}
 
-	// req, _ := http.NewRequest(PostMethod, getCloudbeesFullUrl(config), bytes.NewBuffer(eventJSON))
-	fmt.Println(PrettyPrint(cloudEvent))
-
-	req, _ := http.NewRequest(PostMethod, "https://dbd2-120-60-139-87.ngrok-free.app/token-exchange/oidc", bytes.NewBuffer(eventJSON))
+	req, _ := http.NewRequest(PostMethod, "https://dbd2-120-60-139-87.ngrok-free.app/token-exchange/oidc", bytes.NewBuffer(tokenReqJSON))
 
 	req.Header.Set(ContentTypeHeaderKey, ContentTypeCloudEventsJson)
 	req.Header.Set(AuthorizationHeaderKey, Bearer+oidcToken)
@@ -223,6 +219,16 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	if err != nil {
 		return fmt.Errorf("error reading response body: %w", err)
 	}
+	var tokenResp struct {
+		AccessToken string `json:"access_token"`
+	}
+	if err := json.Unmarshal(bodyBytes, &tokenResp); err != nil {
+		return fmt.Errorf("failed to parse token exchange response: %w", err)
+	}
+
+	if tokenResp.AccessToken == "" {
+		return fmt.Errorf("received empty access token from token exchange")
+	}
 
 	if resp.StatusCode != http.StatusOK {
 		var bodyObj struct {
@@ -232,6 +238,41 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 		}
 		msg := string(bodyBytes)
 		if err := json.Unmarshal(bodyBytes, &bodyObj); err == nil && bodyObj.Message != "" {
+			msg = bodyObj.Message
+		}
+		return fmt.Errorf("error during token exchange - %s : %s", resp.Status, msg)
+	}
+
+	eventJSON, err := json.Marshal(cloudEvent)
+	// req, _ := http.NewRequest(PostMethod, getCloudbeesFullUrl(config), bytes.NewBuffer(eventJSON))
+	fmt.Println(PrettyPrint(cloudEvent))
+
+	eventReq, err := http.NewRequest(PostMethod, "https://dbd2-120-60-139-87.ngrok-free.app/v3/external-events", bytes.NewBuffer(eventJSON))
+	if err != nil {
+		return fmt.Errorf("failed to create event request: %w", err)
+	}
+
+	eventReq.Header.Set(ContentTypeHeaderKey, ContentTypeCloudEventsJson)
+	eventReq.Header.Set(AuthorizationHeaderKey, Bearer+tokenResp.AccessToken)
+
+	eventResp, err := client.Do(eventReq)
+	if err != nil {
+		return fmt.Errorf("error sending external event: %w", err)
+	}
+	defer eventResp.Body.Close()
+
+	eventBodyBytes, err := io.ReadAll(eventResp.Body)
+	if err != nil {
+		return fmt.Errorf("error reading response body: %w", err)
+	}
+	if eventResp.StatusCode != http.StatusAccepted {
+		var bodyObj struct {
+			Code    int           `json:"code"`
+			Message string        `json:"message"`
+			Details []interface{} `json:"details"` // adjust type as needed
+		}
+		msg := string(eventBodyBytes)
+		if err := json.Unmarshal(eventBodyBytes, &bodyObj); err == nil && bodyObj.Message != "" {
 			msg = bodyObj.Message
 		}
 		return fmt.Errorf("error sending CloudEvent to platform - %s : %s", resp.Status, msg)
