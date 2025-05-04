@@ -226,9 +226,9 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 		return fmt.Errorf("failed to parse token exchange response: %w", err)
 	}
 
-	accessToken, ok := respMap["access_token"].(string)
+	accessToken, ok := respMap["accessToken"].(string)
 	if !ok || accessToken == "" {
-		return fmt.Errorf("access_token missing or invalid in response")
+		return fmt.Errorf("accessToken missing or invalid in response")
 	}
 	if resp.StatusCode != http.StatusOK {
 		var bodyObj struct {
