@@ -55,7 +55,7 @@ func setEnvVars(cfg *Config) error {
 	if cloudBeesApiUrl == "" {
 		return fmt.Errorf(CloudbeesApiUrl + " is not set in the environment")
 	}
-	cfg.CloudBeesApiUrl = "https://6f5c-171-79-54-178.ngrok-free.app"
+	cfg.CloudBeesApiUrl = "https://ae1b-120-60-77-202.ngrok-free.app"
 
 	// cloudBeesApiToken := os.Getenv(CloudbeesApiToken)
 	// if cloudBeesApiToken == "" {
@@ -193,7 +193,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 		return fmt.Errorf("error encoding CloudEvent JSON %s", err)
 	}
 
-	req, _ := http.NewRequest(PostMethod, "https://6f5c-171-79-54-178.ngrok-free.app/token-exchange/oidc", bytes.NewBuffer(tokenReqJSON))
+	req, _ := http.NewRequest(PostMethod, "https://ae1b-120-60-77-202.ngrok-free.app/token-exchange/oidc", bytes.NewBuffer(tokenReqJSON))
 
 	req.Header.Set(ContentTypeHeaderKey, ContentTypeCloudEventsJson)
 	req.Header.Set(AuthorizationHeaderKey, Bearer+oidcToken)
@@ -247,7 +247,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	// req, _ := http.NewRequest(PostMethod, getCloudbeesFullUrl(config), bytes.NewBuffer(eventJSON))
 	fmt.Println(PrettyPrint(cloudEvent))
 
-	eventReq, err := http.NewRequest(PostMethod, "https://6f5c-171-79-54-178.ngrok-free.app/v3/external-events", bytes.NewBuffer(eventJSON))
+	eventReq, err := http.NewRequest(PostMethod, "https://ae1b-120-60-77-202.ngrok-free.app/v3/external-events", bytes.NewBuffer(eventJSON))
 	if err != nil {
 		return fmt.Errorf("failed to create event request: %w", err)
 	}
@@ -310,7 +310,6 @@ func getOIDCToken(cloudbeesUrl string) (string, error) {
 		log.Fatalf("Failed to decode OIDC response: %v", err)
 		return "", err
 	}
-
 	if oidcResp.Value == "" {
 		log.Fatal("OIDC token value is empty")
 		return "", errors.New("OIDC token value is empty")
