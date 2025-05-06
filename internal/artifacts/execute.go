@@ -282,7 +282,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 }
 
 func getOIDCToken(cloudbeesUrl string) (string, error) {
-	oidcURL := os.Getenv("ACTIONS_ID_TOKEN_REQUEST_URL") + "&audience=" + cloudbeesUrl
+	oidcURL := os.Getenv("ACTIONS_ID_TOKEN_REQUEST_URL") + "&audience=https://api.cloudbees.io"
 	oidcToken := os.Getenv("ACTIONS_ID_TOKEN_REQUEST_TOKEN")
 
 	req, err := http.NewRequest("GET", oidcURL, nil)
