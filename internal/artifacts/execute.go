@@ -142,7 +142,7 @@ func prepareCloudEvent(config *Config, output Output) (cloudevents.Event, error)
 	cloudEvent.SetSubject(getSubject(config))
 	cloudEvent.SetType(BuildArtifactType)
 	cloudEvent.SetSource(getSource(config))
-	cloudEvent.SetSpecVersion(SpecVersion)
+	cloudEvent.SetSpecVersion("1.1")
 	cloudEvent.SetTime(time.Now())
 	err := cloudEvent.SetData(ContentTypeJson, output)
 	if err != nil {
@@ -176,8 +176,6 @@ func prepareCloudEventData(config *Config) Output {
 	return output
 }
 func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
-	cloudEvent.SetSpecVersion("1.3")
-	fmt.Println(PrettyPrint(cloudEvent))
 	eventJSON, err := json.Marshal(cloudEvent)
 	if err != nil {
 		return fmt.Errorf("error encoding CloudEvent JSON %s", err)
