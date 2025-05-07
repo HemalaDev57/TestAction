@@ -3,12 +3,9 @@ package artifacts
 import (
 	"bytes"
 	"context"
-	"crypto/tls"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -17,6 +14,12 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/google/uuid"
 )
+
+type ErrorResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Details []any  `json:"details"`
+}
 
 func (config *Config) Run(_ context.Context) (err error) {
 
@@ -55,13 +58,13 @@ func setEnvVars(cfg *Config) error {
 	if cloudBeesApiUrl == "" {
 		return fmt.Errorf(CloudbeesApiUrl + " is not set in the environment")
 	}
-	cfg.CloudBeesApiUrl = "https://8998-120-60-77-202.ngrok-free.app"
+	cfg.CloudBeesApiUrl = cloudBeesApiUrl
 
-	// cloudBeesApiToken := os.Getenv(CloudbeesApiToken)
-	// if cloudBeesApiToken == "" {
-	// 	return fmt.Errorf(CloudbeesApiToken + " is not set in the environment")
-	// }
-	// cfg.CloudBeesApiToken = cloudBeesApiToken
+	cloudBeesApiToken := os.Getenv(CloudbeesApiToken)
+	if cloudBeesApiToken == "" {
+		return fmt.Errorf(CloudbeesApiToken + " is not set in the environment")
+	}
+	cfg.CloudBeesApiToken = cloudBeesApiToken
 
 	artifactName := os.Getenv(ArtifactName)
 	if artifactName == "" {
@@ -173,39 +176,34 @@ func prepareCloudEventData(config *Config) Output {
 	return output
 }
 func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
-
-	oidcToken, err := getOIDCToken(config.CloudBeesApiUrl)
-	if err != nil {
-		return fmt.Errorf("failed to create oidc token - %s", err.Error())
-	}
-
-	// For Local Testing
-	// Build the request body as a map
-	requestBody := map[string]interface{}{
-		"token":    oidcToken,
-		"provider": "GITHUB",
-		"audience": "https://api.cloudbees.io", // Optional: omit or override
-	}
-
-	// Marshal to JSON
-	tokenReqJSON, err := json.Marshal(requestBody)
+	eventJSON, err := json.Marshal(cloudEvent)
 	if err != nil {
 		return fmt.Errorf("error encoding CloudEvent JSON %s", err)
 	}
-
-	req, _ := http.NewRequest(PostMethod, "https://8998-120-60-77-202.ngrok-free.app/token-exchange/oidc", bytes.NewBuffer(tokenReqJSON))
+	req, _ := http.NewRequest(PostMethod, getCloudbeesFullUrl(config), bytes.NewBuffer(eventJSON))
+	fmt.Println(PrettyPrint(cloudEvent))
+	// For Local Testing
+	//req, _ := http.NewRequest(PostMethod, "http://localhost:8080/events", bytes.NewBuffer(eventJSON))
 
 	req.Header.Set(ContentTypeHeaderKey, ContentTypeCloudEventsJson)
-	req.Header.Set(AuthorizationHeaderKey, Bearer+oidcToken)
-	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
-	}
+	req.Header.Set(AuthorizationHeaderKey, Bearer+config.CloudBeesApiToken)
+	client := &http.Client{}
 	resp, err := client.Do(req) // Fire and forget
 
 	if err != nil {
 		return fmt.Errorf("error sending CloudEvent to platform - %s", err.Error())
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Println("Error reading response body:", err)
+		}
+		var errorResponse ErrorResponse
+		if err := json.Unmarshal(body, &errorResponse); err != nil {
+			fmt.Println("Error unmarshaling response body:", err)
+		}
+		return fmt.Errorf("error sending CloudEvent to platform - %s : %s", resp.Status, errorResponse.Message)
 	}
 
 	defer func(Body io.ReadCloser) {
@@ -214,109 +212,9 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 			fmt.Println("Error closing response body:", err)
 		}
 	}(resp.Body)
-	fmt.Println("Response Status: " + resp.Status)
-	fmt.Println("Response :", resp)
-	bodyBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("error reading response body: %w", err)
-	}
-	var respMap map[string]interface{}
-	fmt.Println("Response Body:", string(bodyBytes))
-	if err := json.Unmarshal(bodyBytes, &respMap); err != nil {
-		return fmt.Errorf("failed to parse token exchange response: %w", err)
-	}
 
-	accessToken, ok := respMap["accessToken"].(string)
-	if !ok || accessToken == "" {
-		return fmt.Errorf("accessToken missing or invalid in response")
-	}
-	if resp.StatusCode != http.StatusOK {
-		var bodyObj struct {
-			Code    int           `json:"code"`
-			Message string        `json:"message"`
-			Details []interface{} `json:"details"` // adjust type as needed
-		}
-		msg := string(bodyBytes)
-		if err := json.Unmarshal(bodyBytes, &bodyObj); err == nil && bodyObj.Message != "" {
-			msg = bodyObj.Message
-		}
-		return fmt.Errorf("error during token exchange - %s : %s", resp.Status, msg)
-	}
-
-	eventJSON, err := json.Marshal(cloudEvent)
-	// req, _ := http.NewRequest(PostMethod, getCloudbeesFullUrl(config), bytes.NewBuffer(eventJSON))
-	fmt.Println(PrettyPrint(cloudEvent))
-
-	eventReq, err := http.NewRequest(PostMethod, "https://8998-120-60-77-202.ngrok-free.app/v3/external-events", bytes.NewBuffer(eventJSON))
-	if err != nil {
-		return fmt.Errorf("failed to create event request: %w", err)
-	}
-
-	eventReq.Header.Set(ContentTypeHeaderKey, ContentTypeCloudEventsJson)
-	eventReq.Header.Set(AuthorizationHeaderKey, Bearer+accessToken)
-
-	eventResp, err := client.Do(eventReq)
-	if err != nil {
-		return fmt.Errorf("error sending external event: %w", err)
-	}
-	defer eventResp.Body.Close()
-
-	eventBodyBytes, err := io.ReadAll(eventResp.Body)
-	if err != nil {
-		return fmt.Errorf("error reading response body: %w", err)
-	}
-	if eventResp.StatusCode != http.StatusAccepted {
-		var bodyObj struct {
-			Code    int           `json:"code"`
-			Message string        `json:"message"`
-			Details []interface{} `json:"details"` // adjust type as needed
-		}
-		msg := string(eventBodyBytes)
-		if err := json.Unmarshal(eventBodyBytes, &bodyObj); err == nil && bodyObj.Message != "" {
-			msg = bodyObj.Message
-		}
-		return fmt.Errorf("error sending CloudEvent to platform - %s : %s", resp.Status, msg)
-	}
 	fmt.Println("CloudEvent sent successfully!")
 	return nil
-}
-
-func getOIDCToken(cloudbeesUrl string) (string, error) {
-	oidcURL := os.Getenv("ACTIONS_ID_TOKEN_REQUEST_URL") + "&audience=https://api.cloudbees.io"
-	oidcToken := os.Getenv("ACTIONS_ID_TOKEN_REQUEST_TOKEN")
-
-	req, err := http.NewRequest("GET", oidcURL, nil)
-	if err != nil {
-		log.Fatalf("Failed to create OIDC request: %v", err)
-		return "", err
-	}
-	req.Header.Add("Authorization", "Bearer "+oidcToken)
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		log.Fatalf("Failed to execute OIDC request: %v", err)
-		return "", err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(res.Body)
-		log.Fatalf("OIDC token request failed. Status: %d, Body: %s", res.StatusCode, string(body))
-		return "", errors.New("OIDC token request failed")
-	}
-
-	var oidcResp struct{ Value string }
-	if err := json.NewDecoder(res.Body).Decode(&oidcResp); err != nil {
-		log.Fatalf("Failed to decode OIDC response: %v", err)
-		return "", err
-	}
-	if oidcResp.Value == "" {
-		log.Fatal("OIDC token value is empty")
-		return "", errors.New("OIDC token value is empty")
-	}
-	fmt.Println("Response Status:", res.Status)
-	fmt.Println("Response :", res)
-	return oidcResp.Value, nil
 }
 
 // PrettyPrint converts the input to JSON string
