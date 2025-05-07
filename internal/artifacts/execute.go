@@ -126,7 +126,7 @@ func getCloudbeesFullUrl(config *Config) string {
 }
 
 func getSubject(config *Config) string {
-	return "HemalaDev57/gha-capture-event/.github/workflows/publish-build-artifact-preprod1.yaml@refs/heads/master" + "|" + config.GhaRunId + "|" + config.GhaRunAttempt + "|" + config.GhaRunNumber
+	return config.GhaWorkflowRef + "|" + config.GhaRunId + "|" + config.GhaRunAttempt + "|" + config.GhaRunNumber
 }
 
 func getSource(config *Config) string {
@@ -153,14 +153,14 @@ func prepareCloudEvent(config *Config, output Output) (cloudevents.Event, error)
 
 func prepareCloudEventData(config *Config) Output {
 
-	artifactInfo := &ArtifactInfo{
-		ArtifactName:      config.ArtifactName,
-		ArtifactUrl:       config.ArtifactUrl,
-		ArtifactVersion:   config.ArtifactVersion,
-		ArtifactType:      config.ArtifactType,
-		ArtifactDigest:    config.ArtifactDigest,
-		ArtifactOperation: config.ArtifactOperation,
-	}
+	// artifactInfo := &ArtifactInfo{
+	// 	ArtifactName:      config.ArtifactName,
+	// 	ArtifactUrl:       config.ArtifactUrl,
+	// 	ArtifactVersion:   config.ArtifactVersion,
+	// 	ArtifactType:      config.ArtifactType,
+	// 	ArtifactDigest:    config.ArtifactDigest,
+	// 	ArtifactOperation: config.ArtifactOperation,
+	// }
 
 	providerInfo := &ProviderInfo{
 		RunId:      config.GhaRunId,
@@ -170,7 +170,7 @@ func prepareCloudEventData(config *Config) Output {
 		Provider:   GithubProvider,
 	}
 	output := Output{
-		ArtifactInfo: *artifactInfo,
+		// ArtifactInfo: *artifactInfo,
 		ProviderInfo: *providerInfo,
 	}
 	return output
