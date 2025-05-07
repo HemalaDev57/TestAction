@@ -176,7 +176,8 @@ func prepareCloudEventData(config *Config) Output {
 	return output
 }
 func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
-	cloudEvent.SetSpecVersion("1.5")
+	cloudEvent.SetSpecVersion("1.3")
+	fmt.Println(PrettyPrint(cloudEvent))
 	eventJSON, err := json.Marshal(cloudEvent)
 	if err != nil {
 		return fmt.Errorf("error encoding CloudEvent JSON %s", err)
