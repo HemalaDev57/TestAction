@@ -153,14 +153,14 @@ func prepareCloudEvent(config *Config, output Output) (cloudevents.Event, error)
 
 func prepareCloudEventData(config *Config) Output {
 
-	// artifactInfo := &ArtifactInfo{
-	// 	ArtifactName:      config.ArtifactName,
-	// 	ArtifactUrl:       config.ArtifactUrl,
-	// 	ArtifactVersion:   config.ArtifactVersion,
-	// 	ArtifactType:      config.ArtifactType,
-	// 	ArtifactDigest:    config.ArtifactDigest,
-	// 	ArtifactOperation: config.ArtifactOperation,
-	// }
+	artifactInfo := &ArtifactInfo{
+		ArtifactName:      config.ArtifactName,
+		ArtifactUrl:       config.ArtifactUrl,
+		ArtifactVersion:   config.ArtifactVersion,
+		ArtifactType:      config.ArtifactType,
+		ArtifactDigest:    config.ArtifactDigest,
+		ArtifactOperation: config.ArtifactOperation,
+	}
 
 	providerInfo := &ProviderInfo{
 		RunId:      config.GhaRunId,
@@ -170,7 +170,7 @@ func prepareCloudEventData(config *Config) Output {
 		Provider:   GithubProvider,
 	}
 	output := Output{
-		// ArtifactInfo: *artifactInfo,
+		ArtifactInfo: *artifactInfo,
 		ProviderInfo: *providerInfo,
 	}
 	return output
