@@ -184,7 +184,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	requestBody := map[string]interface{}{
 		"token":    oidcToken,
 		"provider": "GITHUB",
-		"audience": "https://api.cloudbees.io", // Optional: omit or override
+		"audience": "https://38a0-120-60-73-147.ngrok-free.app", // Optional: omit or override
 	}
 
 	// Marshal to JSON
