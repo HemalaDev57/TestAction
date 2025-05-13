@@ -193,7 +193,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 		return fmt.Errorf("error encoding CloudEvent JSON %s", err)
 	}
 
-	req, _ := http.NewRequest(PostMethod, "https://96be-120-60-73-147.ngrok-free.app/token-exchange/oidc", bytes.NewBuffer(tokenReqJSON))
+	req, _ := http.NewRequest(PostMethod, "https://96be-120-60-73-147.ngrok-free.app/token-exchange/external-oidc-id-token", bytes.NewBuffer(tokenReqJSON))
 
 	req.Header.Set(ContentTypeHeaderKey, ContentTypeCloudEventsJson)
 	req.Header.Set(AuthorizationHeaderKey, Bearer+oidcToken)
