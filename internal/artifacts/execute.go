@@ -55,7 +55,7 @@ func setEnvVars(cfg *Config) error {
 	if cloudBeesApiUrl == "" {
 		return fmt.Errorf(CloudbeesApiUrl + " is not set in the environment")
 	}
-	cfg.CloudBeesApiUrl = "https://38a0-120-60-73-147.ngrok-free.app"
+	cfg.CloudBeesApiUrl = "https://96be-120-60-73-147.ngrok-free.app"
 
 	// cloudBeesApiToken := os.Getenv(CloudbeesApiToken)
 	// if cloudBeesApiToken == "" {
@@ -184,7 +184,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	requestBody := map[string]interface{}{
 		"token":    oidcToken,
 		"provider": "GITHUB",
-		"audience": "https://38a0-120-60-73-147.ngrok-free.app", // Optional: omit or override
+		"audience": "https://96be-120-60-73-147.ngrok-free.app", // Optional: omit or override
 	}
 
 	// Marshal to JSON
@@ -193,7 +193,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 		return fmt.Errorf("error encoding CloudEvent JSON %s", err)
 	}
 
-	req, _ := http.NewRequest(PostMethod, "https://38a0-120-60-73-147.ngrok-free.app/token-exchange/oidc", bytes.NewBuffer(tokenReqJSON))
+	req, _ := http.NewRequest(PostMethod, "https://96be-120-60-73-147.ngrok-free.app/token-exchange/oidc", bytes.NewBuffer(tokenReqJSON))
 
 	req.Header.Set(ContentTypeHeaderKey, ContentTypeCloudEventsJson)
 	req.Header.Set(AuthorizationHeaderKey, Bearer+oidcToken)
@@ -247,7 +247,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	// req, _ := http.NewRequest(PostMethod, getCloudbeesFullUrl(config), bytes.NewBuffer(eventJSON))
 	fmt.Println(PrettyPrint(cloudEvent))
 
-	eventReq, err := http.NewRequest(PostMethod, "https://38a0-120-60-73-147.ngrok-free.app/v3/external-events", bytes.NewBuffer(eventJSON))
+	eventReq, err := http.NewRequest(PostMethod, "https://96be-120-60-73-147.ngrok-free.app/v3/external-events", bytes.NewBuffer(eventJSON))
 	if err != nil {
 		return fmt.Errorf("failed to create event request: %w", err)
 	}
