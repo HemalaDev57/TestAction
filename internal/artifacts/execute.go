@@ -278,10 +278,12 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 }
 
 func getOIDCToken(cloudbeesUrl string) (string, error) {
-	oidcURL := os.Getenv(ActionIdTokenRequestUrl) + Audience + cloudbeesUrl
 	oidcToken := os.Getenv(ActionIdTokenRequestToken)
-
-	oidcTokenReq, err := http.NewRequest("GET", oidcURL, nil)
+	oidcBaseURL := os.Getenv(ActionIdTokenRequestUrl)
+	oidcReqURL := fmt.Sprintf("%s?audience=%s", oidcBaseURL, url.QueryEscape(cloudbeesUrl))
+	parsedURL, err := url.Parse(oidcReqURL)
+	fmt.Println("Url : " + parsedURL.String())
+	oidcTokenReq, err := http.NewRequest("GET", parsedURL.String(), nil)
 	if err != nil {
 		log.Fatalf("Failed to create OIDC request: %v", err)
 		return "", err
@@ -310,8 +312,6 @@ func getOIDCToken(cloudbeesUrl string) (string, error) {
 		log.Fatal("OIDC token value is empty")
 		return "", errors.New("OIDC token value is empty")
 	}
-	fmt.Println("Response Status:", oidcTokenResp.Status)
-	fmt.Println("Response :", oidcTokenResp.Body)
 	return oidcResp.Value, nil
 }
 
