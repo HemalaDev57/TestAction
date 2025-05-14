@@ -6,7 +6,6 @@ inputs:
     description: 'The CloudBees platform URL.'
     required: false
     default: "https://api.cloudbees.io"
-    required: true
   name:
     description: 'The name of the artifact.'
     required: true
