@@ -265,7 +265,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	if err != nil {
 		return fmt.Errorf("error reading response body: %w", err)
 	}
-	if eventResp.StatusCode != http.StatusAccepted {
+	if eventResp.StatusCode != http.StatusOK {
 		bodyObj := ErrorResponse{}
 		msg := string(eventBodyBytes)
 		if err := json.Unmarshal(eventBodyBytes, &bodyObj); err == nil && bodyObj.Message != "" {
