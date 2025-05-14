@@ -14,7 +14,6 @@ type Config struct {
 	GhaRunAttempt     string `json:"gha-run-attempt,omitempty"`
 	GhaRunNumber      string `json:"gha-run-number,omitempty"`
 	CloudBeesApiUrl   string `json:"cloudbees-api-url,omitempty"`
-	CloudBeesApiToken string `json:"cloudbees-api-token,omitempty"`
 	GhaRepository     string `json:"gha-repository,omitempty"`
 	GhaWorkflowRef    string `json:"gha-workflow-ref,omitempty"`
 	GhaServerUrl      string `json:"gha-server-url,omitempty"`

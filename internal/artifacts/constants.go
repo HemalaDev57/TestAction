@@ -11,7 +11,6 @@ const (
 	GithubRunNumber  = "GITHUB_RUN_NUMBER"
 
 	CloudbeesApiUrl            = "CLOUDBEES_API_URL"
-	CloudbeesApiToken          = "CLOUDBEES_API_TOKEN"
 	PUBLISHED                  = "PUBLISHED"
 	GithubRepository           = "GITHUB_REPOSITORY"
 	GithubWorkflowRef          = "GITHUB_WORKFLOW_REF"
@@ -26,4 +25,8 @@ const (
 	PostMethod                 = "POST"
 	GithubProvider             = "GITHUB"
 	GithubJobName              = "GITHUB_JOB"
+	ActionIdTokenRequestUrl    = "ACTIONS_ID_TOKEN_REQUEST_URL"
+	ActionIdTokenRequestToken  = "ACTIONS_ID_TOKEN_REQUEST_TOKEN"
+	Audience                   = "&audience="
+	AccessToken                = "accessToken"
 )

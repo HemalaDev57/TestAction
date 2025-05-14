@@ -6,8 +6,6 @@ inputs:
     description: 'The CloudBees platform URL.'
     required: false
     default: "https://api.cloudbees.io"
-  cloudbees-pat:
-    description: 'The CloudBees platform personal access token.'
     required: true
   name:
     description: 'The name of the artifact.'

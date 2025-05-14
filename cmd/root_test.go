@@ -31,7 +31,6 @@ func Test_SetDefaultValues(t *testing.T) {
 func Test_Run(t *testing.T) {
 	os.Setenv(artifacts.GithubRunId, "123456789")
 	os.Setenv(artifacts.GithubRunAttempt, "1")
-	os.Setenv(artifacts.CloudbeesApiToken, "testtoken")
 	os.Setenv(artifacts.ArtifactName, "testartifact")
 	os.Setenv(artifacts.ArtifactUrl, "https://test.com")
 	os.Setenv(artifacts.ArtifactVersion, "1.0.0")
@@ -56,7 +55,6 @@ func Test_Run(t *testing.T) {
 func Test_Failure(t *testing.T) {
 	os.Setenv(artifacts.GithubRunId, "123456789")
 	os.Setenv(artifacts.GithubRunAttempt, "1")
-	os.Setenv(artifacts.CloudbeesApiToken, "testtoken")
 	os.Setenv(artifacts.ArtifactName, "testartifact")
 	os.Setenv(artifacts.ArtifactUrl, "https://test.com")
 	os.Setenv(artifacts.ArtifactVersion, "1.0.0")

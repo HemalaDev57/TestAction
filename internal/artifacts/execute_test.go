@@ -42,24 +42,11 @@ func TestRun(t *testing.T) {
 		assert.Equal(t, err.Error(), CloudbeesApiUrl+" is not set in the environment")
 	})
 
-	t.Run("Missing Env:"+CloudbeesApiToken, func(t *testing.T) {
-		var config = Config{}
-		os.Setenv(GithubRunId, "123456789")
-		os.Setenv(GithubRunAttempt, "1")
-		os.Setenv(CloudbeesApiUrl, "https://api-test.cloudbees.com")
-
-		err := config.Run(context.Background())
-		fmt.Println(err)
-		assert.NotNil(t, err)
-		assert.Equal(t, err.Error(), CloudbeesApiToken+" is not set in the environment")
-	})
-
 	t.Run("Missing Env:"+ArtifactName, func(t *testing.T) {
 		var config = Config{}
 		os.Setenv(GithubRunId, "123456789")
 		os.Setenv(GithubRunAttempt, "1")
 		os.Setenv(CloudbeesApiUrl, "https://api-test.cloudbees.com")
-		os.Setenv(CloudbeesApiToken, "testtoken")
 		err := config.Run(context.Background())
 		fmt.Println(err)
 		assert.NotNil(t, err)
@@ -71,7 +58,6 @@ func TestRun(t *testing.T) {
 		os.Setenv(GithubRunId, "123456789")
 		os.Setenv(GithubRunAttempt, "1")
 		os.Setenv(CloudbeesApiUrl, "https://api-test.cloudbees.com")
-		os.Setenv(CloudbeesApiToken, "testtoken")
 		os.Setenv(ArtifactName, "testartifact")
 		err := config.Run(context.Background())
 		fmt.Println(err)
@@ -84,7 +70,6 @@ func TestRun(t *testing.T) {
 		os.Setenv(GithubRunId, "123456789")
 		os.Setenv(GithubRunAttempt, "1")
 		os.Setenv(CloudbeesApiUrl, "https://api-test.cloudbees.com")
-		os.Setenv(CloudbeesApiToken, "testtoken")
 		os.Setenv(ArtifactName, "testartifact")
 		os.Setenv(ArtifactUrl, "https://test.com")
 		err := config.Run(context.Background())
@@ -98,7 +83,6 @@ func TestRun(t *testing.T) {
 		os.Setenv(GithubRunId, "123456789")
 		os.Setenv(GithubRunAttempt, "1")
 		os.Setenv(CloudbeesApiUrl, "https://api-test.cloudbees.com")
-		os.Setenv(CloudbeesApiToken, "testtoken")
 		os.Setenv(ArtifactName, "testartifact")
 		os.Setenv(ArtifactUrl, "https://test.com")
 		os.Setenv(ArtifactVersion, "1.0.0")
@@ -113,7 +97,6 @@ func TestRun(t *testing.T) {
 		os.Setenv(GithubRunId, "123456789")
 		os.Setenv(GithubRunAttempt, "1")
 		os.Setenv(CloudbeesApiUrl, "https://api-test.cloudbees.com")
-		os.Setenv(CloudbeesApiToken, "testtoken")
 		os.Setenv(ArtifactName, "testartifact")
 		os.Setenv(ArtifactUrl, "https://test.com")
 		os.Setenv(ArtifactVersion, "1.0.0")
@@ -129,7 +112,6 @@ func TestRun(t *testing.T) {
 		os.Setenv(GithubRunId, "123456789")
 		os.Setenv(GithubRunAttempt, "1")
 		os.Setenv(CloudbeesApiUrl, "https://api-test.cloudbees.com")
-		os.Setenv(CloudbeesApiToken, "testtoken")
 		os.Setenv(ArtifactName, "testartifact")
 		os.Setenv(ArtifactUrl, "https://test.com")
 		os.Setenv(ArtifactVersion, "1.0.0")
@@ -146,13 +128,12 @@ func TestRun(t *testing.T) {
 		os.Setenv(GithubRunId, "123456789")
 		os.Setenv(GithubRunAttempt, "1")
 		os.Setenv(CloudbeesApiUrl, "https://api-test.cloudbees.com")
-		os.Setenv(CloudbeesApiToken, "testtoken")
 		os.Setenv(ArtifactName, "testartifact")
 		os.Setenv(ArtifactUrl, "https://test.com")
 		os.Setenv(ArtifactVersion, "1.0.0")
 		os.Setenv(GithubRunNumber, "123")
 		os.Setenv(GithubRepository, "test/test")
-		os.Setenv(GithubWorkflowRef, "HemalaDev57/TestAction/.github/workflows/test_action.yml@refs/heads/main")
+		os.Setenv(GithubWorkflowRef, "SrimanPadmanabanCB/gha-action/.github/workflows/test_action.yml@refs/heads/main")
 
 		err := config.Run(context.Background())
 		fmt.Println(err)
@@ -163,7 +144,6 @@ func TestRun(t *testing.T) {
 		var config = Config{}
 		os.Setenv(GithubRunId, "123456789")
 		os.Setenv(GithubRunAttempt, "1")
-		os.Setenv(CloudbeesApiToken, "testtoken")
 		os.Setenv(ArtifactName, "testartifact")
 		os.Setenv(ArtifactUrl, "https://test.com")
 		os.Setenv(ArtifactVersion, "1.0.0")
@@ -191,7 +171,6 @@ func TestRun(t *testing.T) {
 		var config = Config{}
 		os.Setenv(GithubRunId, "123456789")
 		os.Setenv(GithubRunAttempt, "1")
-		os.Setenv(CloudbeesApiToken, "testtoken")
 		os.Setenv(ArtifactName, "testartifact")
 		os.Setenv(ArtifactUrl, "https://test.com")
 		os.Setenv(ArtifactVersion, "1.0.0")
@@ -219,7 +198,6 @@ func TestRun(t *testing.T) {
 		var config = Config{}
 		os.Setenv(GithubRunId, "123456789")
 		os.Setenv(GithubRunAttempt, "1")
-		os.Setenv(CloudbeesApiToken, "testtoken")
 		os.Setenv(ArtifactName, "testartifact")
 		os.Setenv(ArtifactUrl, "https://test.com")
 		os.Setenv(ArtifactVersion, "1.0.0")
@@ -240,14 +218,13 @@ func TestRun(t *testing.T) {
 		err := config.Run(context.Background())
 		fmt.Println(err)
 		assert.NotNil(t, err)
-		assert.Equal(t, err.Error(), "error sending CloudEvent to platform 502 Bad Gateway")
+		assert.Equal(t, err.Error(), "error sending CloudEvent to platform - 502 Bad Gateway : ")
 	})
 
 	t.Run("Error sending CloudEvent", func(t *testing.T) {
 		var config = Config{}
 		os.Setenv(GithubRunId, "123456789")
 		os.Setenv(GithubRunAttempt, "1")
-		os.Setenv(CloudbeesApiToken, "testtoken")
 		os.Setenv(ArtifactName, "testartifact")
 		os.Setenv(ArtifactUrl, "https://test.com")
 		os.Setenv(ArtifactVersion, "1.0.0")
