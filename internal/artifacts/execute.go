@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -187,12 +188,14 @@ func prepareCloudEventData(config *Config) Output {
 func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	// Fetch the OIDC token
 	// This token is used to authenticate the request to the CloudBees API
+	fmt.Println("Started fetching OIDC Token...")
 	oidcToken, err := getOIDCToken(config.CloudBeesApiUrl)
 	if err != nil {
 		return fmt.Errorf("failed to create oidc token - %s", err.Error())
 	}
 	fmt.Println("OIDC Token fetched successfully!")
 
+	fmt.Println("Initiated exchanging the OIDC Token with CBP token...")
 	tokenRequestObj := TokenRequest{
 		Token:    oidcToken,
 		Provider: GithubProvider,
@@ -219,7 +222,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 			fmt.Println("Error closing response body:", err)
 		}
 	}(tokenResp.Body)
-	fmt.Println("Response Status: " + tokenResp.Status)
+
 	bodyBytes, err := io.ReadAll(tokenResp.Body)
 	if err != nil {
 		return fmt.Errorf("error reading response body: %w", err)
@@ -234,7 +237,6 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	}
 
 	var respMap map[string]interface{}
-	fmt.Println("Response Body:", string(bodyBytes))
 	if err := json.Unmarshal(bodyBytes, &respMap); err != nil {
 		return fmt.Errorf("failed to parse token exchange response: %w", err)
 	}
@@ -243,8 +245,9 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	if !ok || accessToken == "" {
 		return fmt.Errorf("accessToken missing or invalid in response")
 	}
-	fmt.Println("Access token fetched. Token exchange successful!")
+	fmt.Println("Token exchange successful!")
 
+	fmt.Println("Initiated sending the CloudEvent to platform...")
 	eventJSON, err := json.Marshal(cloudEvent)
 	fmt.Println(PrettyPrint(cloudEvent))
 
