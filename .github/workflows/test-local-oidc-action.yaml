@@ -1,0 +1,24 @@
+name: Test LOCAL OIDC
+
+on:
+  workflow_dispatch:
+  
+jobs:
+  run-go-action:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Run My Custom Go Action
+        uses: HemalaDev57/TestAction@master
+        with:
+          name: "custom-action"
+          version: 1.0.1
+          url: "ghcr.io/hemaladev57/testaction/custom-action:latest"
+          digest: "test"
+          type: "docker"
+          cloudbees-url: "https://5158-2401-4900-67ab-316a-cc9f-3303-ff6a-8572.ngrok-free.app"
