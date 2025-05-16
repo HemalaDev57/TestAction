@@ -283,36 +283,36 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 func getOIDCToken(cloudbeesUrl string) (string, error) {
 	oidcToken := os.Getenv(ActionIdTokenRequestToken)
 	oidcBaseURL := os.Getenv(ActionIdTokenRequestUrl)
-	oidcReqURL := fmt.Sprintf("%s?audience=%s", oidcBaseURL, url.QueryEscape(cloudbeesUrl))
-	parsedURL, err := url.Parse(oidcReqURL)
-	fmt.Println("Url : " + parsedURL.String())
-	oidcTokenReq, err := http.NewRequest("GET", parsedURL.String(), nil)
+	oidcAudience := url.QueryEscape(cloudbeesUrl)
+	oidcURL := fmt.Sprintf("%s?audience=%s", oidcBaseURL, oidcAudience)
+
+	oidcTokenReq, err := http.NewRequest("GET", oidcURL, nil)
 	if err != nil {
-		log.Fatalf("Failed to create OIDC request: %v", err)
+		log.Printf("Failed to create OIDC request: %v", err)
 		return "", err
 	}
 	oidcTokenReq.Header.Add(AuthorizationHeaderKey, Bearer+oidcToken)
-
-	oidcTokenResp, err := http.DefaultClient.Do(oidcTokenReq)
+	client := &http.Client{}
+	oidcTokenResp, err := client.Do(oidcTokenReq)
 	if err != nil {
-		log.Fatalf("Failed to execute OIDC request: %v", err)
+		log.Printf("Failed to execute OIDC request: %v", err)
 		return "", err
 	}
 	defer oidcTokenResp.Body.Close()
 
 	if oidcTokenResp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(oidcTokenResp.Body)
-		log.Fatalf("OIDC token request failed. Status: %d, Body: %s", oidcTokenResp.StatusCode, string(body))
+		log.Printf("OIDC token request failed. Status: %d, Body: %s", oidcTokenResp.StatusCode, string(body))
 		return "", errors.New("OIDC token request failed")
 	}
 
 	var oidcResp struct{ Value string }
 	if err := json.NewDecoder(oidcTokenResp.Body).Decode(&oidcResp); err != nil {
-		log.Fatalf("Failed to decode OIDC response: %v", err)
+		log.Printf("Failed to decode OIDC response: %v", err)
 		return "", err
 	}
 	if oidcResp.Value == "" {
-		log.Fatal("OIDC token value is empty")
+		log.Printf("OIDC token value is empty")
 		return "", errors.New("OIDC token value is empty")
 	}
 	return oidcResp.Value, nil

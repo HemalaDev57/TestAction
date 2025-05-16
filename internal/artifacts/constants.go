@@ -27,6 +27,5 @@ const (
 	GithubJobName              = "GITHUB_JOB"
 	ActionIdTokenRequestUrl    = "ACTIONS_ID_TOKEN_REQUEST_URL"
 	ActionIdTokenRequestToken  = "ACTIONS_ID_TOKEN_REQUEST_TOKEN"
-	Audience                   = "&audience="
 	AccessToken                = "accessToken"
 )
