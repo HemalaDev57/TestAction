@@ -6,6 +6,7 @@ const (
 	ArtifactVersion  = "ARTIFACT_VERSION"
 	ArtifactType     = "ARTIFACT_TYPE"
 	ArtifactDigest   = "ARTIFACT_DIGEST"
+	ArtifactLabel    = "ARTIFACT_LABEL"
 	GithubRunId      = "GITHUB_RUN_ID"
 	GithubRunAttempt = "GITHUB_RUN_ATTEMPT"
 	GithubRunNumber  = "GITHUB_RUN_NUMBER"

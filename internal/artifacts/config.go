@@ -10,6 +10,7 @@ type Config struct {
 	ArtifactType      string `json:"artifact-type,omitempty"`
 	ArtifactDigest    string `json:"artifact-digest,omitempty"`
 	ArtifactOperation string `json:"artifact-operation,omitempty"`
+	ArtifactLabel     string `json:"artifact-label,omitempty"`
 	GhaRunId          string `json:"gha-run-id,omitempty"`
 	GhaRunAttempt     string `json:"gha-run-attempt,omitempty"`
 	GhaRunNumber      string `json:"gha-run-number,omitempty"`

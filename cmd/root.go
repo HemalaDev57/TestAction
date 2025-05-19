@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 	"gha-register-build-artifact/internal/artifacts"
-	"github.com/spf13/cobra"
 	"os"
 	"os/signal"
+
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -41,8 +42,14 @@ func setDefaultValues(cfg *artifacts.Config) {
 	} else {
 		cfg.ArtifactDigest = ""
 	}
-	cfg.ArtifactOperation = artifacts.PUBLISHED
 
+	artifactLabel := os.Getenv(artifacts.ArtifactLabel)
+	if artifactLabel != "" {
+		cfg.ArtifactLabel = artifactLabel
+	} else {
+		cfg.ArtifactLabel = ""
+	}
+	cfg.ArtifactOperation = artifacts.PUBLISHED
 }
 
 func run(_ *cobra.Command, args []string) error {

@@ -118,6 +118,8 @@ func setEnvVars(cfg *Config) error {
 
 	cfg.GhaServerUrl = os.Getenv(GithubServerUrl)
 
+	cfg.ArtifactLabel = os.Getenv(ArtifactLabel)
+
 	return nil
 }
 
@@ -146,6 +148,7 @@ func getSource(config *Config) string {
 	}
 	return sourcePrefix + config.GhaRepository
 }
+
 func prepareCloudEvent(config *Config, output Output) (cloudevents.Event, error) {
 	cloudEvent := cloudevents.NewEvent()
 	cloudEvent.SetID(uuid.NewString())
@@ -170,6 +173,7 @@ func prepareCloudEventData(config *Config) Output {
 		ArtifactType:      config.ArtifactType,
 		ArtifactDigest:    config.ArtifactDigest,
 		ArtifactOperation: config.ArtifactOperation,
+		ArtifactLabel:     config.ArtifactLabel,
 	}
 
 	providerInfo := &ProviderInfo{
@@ -185,6 +189,7 @@ func prepareCloudEventData(config *Config) Output {
 	}
 	return output
 }
+
 func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	// Fetch the OIDC token
 	// This token is used to authenticate the request to the CloudBees API
@@ -199,7 +204,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	tokenRequestObj := TokenRequest{
 		Token:    oidcToken,
 		Provider: GithubProvider,
-		Audience: config.CloudBeesApiUrl, // Optional: omit or override
+		Audience: strings.TrimSuffix(config.CloudBeesApiUrl, "/"), // Optional: omit or override
 	}
 	tokenReqJSON, err := json.Marshal(tokenRequestObj)
 	if err != nil {
@@ -283,7 +288,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 func getOIDCToken(cloudbeesUrl string) (string, error) {
 	oidcToken := os.Getenv(ActionIdTokenRequestToken)
 	oidcBaseURL := os.Getenv(ActionIdTokenRequestUrl)
-	oidcAudience := url.QueryEscape(cloudbeesUrl)
+	oidcAudience := url.QueryEscape(strings.TrimSuffix(cloudbeesUrl, "/"))
 	oidcURL := fmt.Sprintf("%s?audience=%s", oidcBaseURL, oidcAudience)
 
 	oidcTokenReq, err := http.NewRequest("GET", oidcURL, nil)
@@ -319,7 +324,7 @@ func getOIDCToken(cloudbeesUrl string) (string, error) {
 }
 
 // PrettyPrint converts the input to JSON string
-func PrettyPrint(in interface{}) string {
+func PrettyPrint(in any) string {
 	data, err := json.MarshalIndent(in, "", "  ")
 	if err != nil {
 		fmt.Println("error marshalling response", err)

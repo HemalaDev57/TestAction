@@ -1,10 +1,12 @@
 package cmd
 
 import (
+	"fmt"
 	"gha-register-build-artifact/internal/artifacts"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -35,19 +37,31 @@ func Test_Run(t *testing.T) {
 	os.Setenv(artifacts.ArtifactUrl, "https://test.com")
 	os.Setenv(artifacts.ArtifactVersion, "1.0.0")
 	os.Setenv(artifacts.GithubRunNumber, "123")
-	os.Setenv(artifacts.GithubRepository, "HemalaDev57/TestAction")
-	os.Setenv(artifacts.GithubWorkflowRef, "HemalaDev57/TestAction/.github/workflows/test_action.yml@refs/heads/main")
+	os.Setenv(artifacts.GithubRepository, "SrimanPadmanabanCB/gha-action")
+	os.Setenv(artifacts.GithubWorkflowRef, "SrimanPadmanabanCB/gha-action/.github/workflows/test_action.yml@refs/heads/main")
 	os.Setenv(artifacts.GithubServerUrl, "https://github.com")
 	os.Setenv(artifacts.GithubJobName, "testjob")
+	os.Setenv(artifacts.ArtifactLabel, "labelA,labelB,labelC")
 
-	// Create a test server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
+		fmt.Println("Mock Request URL:", r.URL.String())
+		switch {
+		case r.Method == "GET" && strings.HasPrefix(r.URL.String(), "/?audience="):
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"value": "mock-oidc-token"}`))
+		case r.Method == "POST" && r.URL.Path == "/token-exchange/external-oidc-id-token":
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"accessToken": "mock-cbp-token"}`))
+		case r.Method == "POST" && r.URL.Path == "/v3/external-events":
+			w.WriteHeader(http.StatusOK)
+		default:
+			http.Error(w, "unexpected request: "+r.URL.Path, http.StatusNotFound)
+		}
 	}))
 	defer ts.Close()
 
-	// Set the httpClient to use the test server
 	os.Setenv(artifacts.CloudbeesApiUrl, ts.URL)
+	os.Setenv(artifacts.ActionIdTokenRequestUrl, ts.URL)
 	err := run(nil, nil)
 	assert.Nil(t, err)
 }
@@ -59,19 +73,36 @@ func Test_Failure(t *testing.T) {
 	os.Setenv(artifacts.ArtifactUrl, "https://test.com")
 	os.Setenv(artifacts.ArtifactVersion, "1.0.0")
 	os.Setenv(artifacts.GithubRunNumber, "123")
-	os.Setenv(artifacts.GithubRepository, "HemalaDev57/TestAction")
-	os.Setenv(artifacts.GithubWorkflowRef, "HemalaDev57/TestAction/.github/workflows/test_action.yml@refs/heads/main")
+	os.Setenv(artifacts.GithubRepository, "SrimanPadmanabanCB/gha-action")
+	os.Setenv(artifacts.GithubWorkflowRef, "SrimanPadmanabanCB/gha-action/.github/workflows/test_action.yml@refs/heads/main")
 	os.Setenv(artifacts.GithubServerUrl, "https://github.com")
 	os.Setenv(artifacts.GithubJobName, "testjob")
+	os.Setenv(artifacts.ArtifactLabel, "labelA,labelB,labelC")
 
-	// Create a test server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
+		fmt.Println("Mock Request URL:", r.URL.String())
+		switch {
+		case r.Method == "GET" && strings.HasPrefix(r.URL.String(), "/?audience="):
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"value": "mock-oidc-token"}`))
+		case r.Method == "POST" && r.URL.Path == "/token-exchange/external-oidc-id-token":
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"accessToken": "mock-cbp-token"}`))
+		case r.Method == "POST" && r.URL.Path == "/v3/external-events":
+			w.WriteHeader(http.StatusBadGateway)
+		default:
+			http.Error(w, "unexpected request: "+r.URL.Path, http.StatusNotFound)
+		}
 	}))
 	defer ts.Close()
 
-	// Set the httpClient to use the test server
 	os.Setenv(artifacts.CloudbeesApiUrl, ts.URL)
+	os.Setenv(artifacts.ActionIdTokenRequestUrl, ts.URL)
 	err := run(nil, nil)
-	assert.Nil(t, err)
+	assert.Contains(t, err.Error(), "error sending CloudEvent to platform")
+}
+
+func Test_Failure_1(t *testing.T) {
+	err := run(nil, []string{"test, command"})
+	assert.Contains(t, err.Error(), "unknown arguments:")
 }

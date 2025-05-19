@@ -7,6 +7,7 @@ type ArtifactInfo struct {
 	ArtifactType      string `json:"artifact_type,omitempty"`
 	ArtifactDigest    string `json:"artifact_digest,omitempty"`
 	ArtifactOperation string `json:"artifact_operation,omitempty"`
+	ArtifactLabel     string `json:"artifact_label,omitempty"`
 }
 
 type ProviderInfo struct {
@@ -18,6 +19,6 @@ type ProviderInfo struct {
 }
 
 type Output struct {
-	ProviderInfo ProviderInfo `json:"provider_info,omitempty"`
-	ArtifactInfo ArtifactInfo `json:"artifact_info,omitempty"`
+	ProviderInfo ProviderInfo `json:"provider_info"`
+	ArtifactInfo ArtifactInfo `json:"artifact_info"`
 }
