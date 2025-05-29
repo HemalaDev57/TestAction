@@ -167,13 +167,12 @@ func prepareCloudEvent(config *Config, output Output) (cloudevents.Event, error)
 func prepareCloudEventData(config *Config) Output {
 
 	artifactInfo := &ArtifactInfo{
-		ArtifactName:      config.ArtifactName,
-		ArtifactUrl:       config.ArtifactUrl,
-		ArtifactVersion:   config.ArtifactVersion,
-		ArtifactType:      config.ArtifactType,
-		ArtifactDigest:    config.ArtifactDigest,
-		ArtifactOperation: config.ArtifactOperation,
-		ArtifactLabel:     config.ArtifactLabel,
+		ArtifactName:    config.ArtifactName,
+		ArtifactUrl:     config.ArtifactUrl,
+		ArtifactVersion: config.ArtifactVersion,
+		ArtifactType:    config.ArtifactType,
+		ArtifactDigest:  config.ArtifactDigest,
+		ArtifactLabel:   config.ArtifactLabel,
 	}
 
 	providerInfo := &ProviderInfo{

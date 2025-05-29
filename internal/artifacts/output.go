@@ -1,13 +1,12 @@
 package artifacts
 
 type ArtifactInfo struct {
-	ArtifactName      string `json:"artifact_name,omitempty"`
-	ArtifactUrl       string `json:"artifact_url,omitempty"`
-	ArtifactVersion   string `json:"artifact_version,omitempty"`
-	ArtifactType      string `json:"artifact_type,omitempty"`
-	ArtifactDigest    string `json:"artifact_digest,omitempty"`
-	ArtifactOperation string `json:"artifact_operation,omitempty"`
-	ArtifactLabel     string `json:"artifact_label,omitempty"`
+	ArtifactName    string `json:"artifact_name,omitempty"`
+	ArtifactUrl     string `json:"artifact_url,omitempty"`
+	ArtifactVersion string `json:"artifact_version,omitempty"`
+	ArtifactType    string `json:"artifact_type,omitempty"`
+	ArtifactDigest  string `json:"artifact_digest,omitempty"`
+	ArtifactLabel   string `json:"artifact_label,omitempty"`
 }
 
 type ProviderInfo struct {

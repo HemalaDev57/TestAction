@@ -17,7 +17,6 @@ func Test_SetDefaultValuesEmpty(t *testing.T) {
 	setDefaultValues(&config)
 	assert.Equal(t, config.ArtifactType, "")
 	assert.Equal(t, config.ArtifactDigest, "")
-	assert.Equal(t, config.ArtifactOperation, artifacts.PUBLISHED)
 }
 
 func Test_SetDefaultValues(t *testing.T) {
@@ -27,7 +26,6 @@ func Test_SetDefaultValues(t *testing.T) {
 	setDefaultValues(&config)
 	assert.Equal(t, config.ArtifactType, "123456789")
 	assert.Equal(t, config.ArtifactDigest, "123456789:digest")
-	assert.Equal(t, config.ArtifactOperation, artifacts.PUBLISHED)
 }
 
 func Test_Run(t *testing.T) {

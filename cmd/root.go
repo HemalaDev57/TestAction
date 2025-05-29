@@ -49,7 +49,6 @@ func setDefaultValues(cfg *artifacts.Config) {
 	} else {
 		cfg.ArtifactLabel = ""
 	}
-	cfg.ArtifactOperation = artifacts.PUBLISHED
 }
 
 func run(_ *cobra.Command, args []string) error {
