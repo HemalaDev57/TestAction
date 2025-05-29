@@ -25,7 +25,6 @@ type ErrorResponse struct {
 }
 
 type TokenRequest struct {
-	Token    string `json:"token"`
 	Provider string `json:"provider"`
 	Audience string `json:"audience"`
 }
@@ -201,7 +200,6 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 
 	fmt.Println("Initiated exchanging the OIDC Token with CBP token...")
 	tokenRequestObj := TokenRequest{
-		Token:    oidcToken,
 		Provider: GithubProvider,
 		Audience: strings.TrimSuffix(config.CloudBeesApiUrl, "/"), // Optional: omit or override
 	}
