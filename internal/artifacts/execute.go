@@ -247,6 +247,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	if !ok || accessToken == "" {
 		return fmt.Errorf("accessToken missing or invalid in response")
 	}
+	fmt.Println(accessToken)
 	fmt.Println("Token exchange successful!")
 
 	fmt.Println("Initiated sending the CloudEvent to platform...")
@@ -283,6 +284,10 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 }
 
 func getOIDCToken(cloudbeesUrl string) (string, error) {
+	log.Println(ActionIdTokenRequestToken)
+	log.Println(os.Getenv(ActionIdTokenRequestToken))
+	log.Println(ActionIdTokenRequestUrl)
+	log.Println(os.Getenv(ActionIdTokenRequestUrl))
 	oidcToken := os.Getenv(ActionIdTokenRequestToken)
 	oidcBaseURL := os.Getenv(ActionIdTokenRequestUrl)
 	oidcAudience := url.QueryEscape(strings.TrimSuffix(cloudbeesUrl, "/"))
@@ -317,6 +322,8 @@ func getOIDCToken(cloudbeesUrl string) (string, error) {
 		log.Printf("OIDC token value is empty")
 		return "", errors.New("OIDC token value is empty")
 	}
+	log.Print("Response Value : ")
+	log.Println(oidcResp.Value)
 	return oidcResp.Value, nil
 }
 
