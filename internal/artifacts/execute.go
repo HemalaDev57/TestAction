@@ -3,6 +3,7 @@ package artifacts
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -247,7 +248,8 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	if !ok || accessToken == "" {
 		return fmt.Errorf("accessToken missing or invalid in response")
 	}
-	fmt.Println(accessToken)
+	encoded := base64.StdEncoding.EncodeToString([]byte(accessToken))
+	fmt.Println("Encoded access token:", encoded)
 	fmt.Println("Token exchange successful!")
 
 	fmt.Println("Initiated sending the CloudEvent to platform...")
@@ -285,7 +287,8 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 
 func getOIDCToken(cloudbeesUrl string) (string, error) {
 	log.Println(ActionIdTokenRequestToken)
-	log.Println(os.Getenv(ActionIdTokenRequestToken))
+	encoded := base64.StdEncoding.EncodeToString([]byte(os.Getenv(ActionIdTokenRequestToken)))
+	log.Println(encoded)
 	log.Println(ActionIdTokenRequestUrl)
 	log.Println(os.Getenv(ActionIdTokenRequestUrl))
 	oidcToken := os.Getenv(ActionIdTokenRequestToken)
