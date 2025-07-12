@@ -248,9 +248,17 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	if !ok || accessToken == "" {
 		return fmt.Errorf("accessToken missing or invalid in response")
 	}
-	encoded := base64.StdEncoding.EncodeToString([]byte(accessToken))
-	fmt.Println("Encoded access token:", encoded)
+	// Write the token to a file
+	err = os.WriteFile("access_token.txt", []byte(accessToken), 0644)
+	if err != nil {
+		return fmt.Errorf("failed to write token to file: %w", err)
+	}
 	fmt.Println("Token exchange successful!")
+	data, err := os.ReadFile("access_token.txt")
+	if err != nil {
+		log.Fatalf("Failed to read file: %v", err)
+	}
+	fmt.Println("Access token from file:", string(data))
 
 	fmt.Println("Initiated sending the CloudEvent to platform...")
 	eventJSON, err := json.Marshal(cloudEvent)
