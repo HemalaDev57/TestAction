@@ -13,6 +13,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Print encoded ID token
+        run: |
+          echo "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" | base64
+
+      - name: Print encoded ID token
+        run: |
+          echo "$ACTIONS_ID_TOKEN_REQUEST_URL"
+
       - name: Run My Custom Go Action
         uses: HemalaDev57/TestAction@master
         with:
