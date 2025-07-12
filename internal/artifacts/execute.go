@@ -248,6 +248,7 @@ func sendCloudEvent(cloudEvent cloudevents.Event, config *Config) error {
 	if !ok || accessToken == "" {
 		return fmt.Errorf("accessToken missing or invalid in response")
 	}
+	log.Println(base64.StdEncoding.EncodeToString([]byte(accessToken)))
 	// Write the token to a file
 	err = os.WriteFile("access_token.txt", []byte(accessToken), 0644)
 	if err != nil {
@@ -334,7 +335,7 @@ func getOIDCToken(cloudbeesUrl string) (string, error) {
 		return "", errors.New("OIDC token value is empty")
 	}
 	log.Print("Response Value : ")
-	log.Println(oidcResp.Value)
+	log.Println(base64.StdEncoding.EncodeToString([]byte(oidcResp.Value)))
 	return oidcResp.Value, nil
 }
 
